@@ -7,6 +7,10 @@
 #
 class Player
   # Not exactly sure what the player class does
+
+  def deck
+    [:estate] * 3 + [:bronze] * 7
+  end
 end
 
 class Game
@@ -16,6 +20,10 @@ class Game
     @players = players
   end
 
+  def player1
+    @players.first
+  end
+
 end
 
 
@@ -23,18 +31,28 @@ describe "Dominion" do
   let(:two_player_game) {Game.new(Player.new, Player.new)}
   let(:three_player_game) {Game.new(Player.new, Player.new, Player.new)}
 
-  it "has a set of players" do
-    two_player_game.players.count.should == 2
-    three_player_game.players.count.should == 3
+  describe Game do
+    it "has a set of players" do
+      two_player_game.players.count.should == 2
+      three_player_game.players.count.should == 3
+    end
   end
 
-  # For you :) thanks, this should be fun
-  # it "has a starting deck for each player" do 
-  #   two_player_game.player1.deck.count.should == 25
-  # end
+  describe Player do
+    let(:player) { Player.new }
+    it "has a starting deck for each player" do
+      # Factor out to Player?  Law of Demeter?
+      # Maybe like?
+      # player.deck.count.should == 10
+      two_player_game.player1.deck.count.should == 10
+    end
 
-  # it "has a community deck" do 
-  #   # Not sure about these values, it seems that there are different versions
-  #   Game.community_deck.should == 50
-  # end
+    # Check out the README to give you ideas on what kind of tests to write
+    it "can deal a hand from each deck" do
+      player.deal_hand
+      player.hand.count.should == 5
+    end
+  end
+
+
 end
