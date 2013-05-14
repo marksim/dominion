@@ -7,10 +7,21 @@
 #
 class Player
   # Not exactly sure what the player class does
+  attr_reader :hand
+
+  def initialize
+    @hand = []
+  end
 
   def deck
     [:estate] * 3 + [:bronze] * 7
   end
+
+  def deal_hand
+    @hand = deck.shuffle[0..4]
+    @hand
+  end
+
 end
 
 class Game
@@ -35,6 +46,14 @@ describe "Dominion" do
     it "has a set of players" do
       two_player_game.players.count.should == 2
       three_player_game.players.count.should == 3
+    end
+
+    it "starts with player1 making a turn " do 
+      # This probably has to be broken up - Thanks!
+      player1.hand = [:estate, :estate, :bronze, :bronze, :bronze]
+      player1.play(:estate)
+      player1.play(:bronze, :bronze, :bronze)
+      player1.buy(:gold)
     end
   end
 
