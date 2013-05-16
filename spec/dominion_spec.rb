@@ -11,17 +11,24 @@ class Player
 
   def initialize
     @hand = []
+    @deck = [:estate] * 3 + [:bronze] * 7
   end
 
-  def deck
-    [:estate] * 3 + [:bronze] * 7
-  end
+  attr_reader :hand
+  attr_accessor :deck
 
   def deal_hand
     @hand = deck.shuffle[0..4]
     @hand
   end
 
+  def play(*cards)
+  end
+
+  def buy(card)
+    @deck << card
+    true
+  end
 end
 
 class Game
@@ -48,22 +55,32 @@ describe "Dominion" do
       three_player_game.players.count.should == 3
     end
 
-    it "starts with player1 making a turn " do 
-      # This probably has to be broken up - Thanks!
-      player1.hand = [:estate, :estate, :bronze, :bronze, :bronze]
-      player1.play(:estate)
-      player1.play(:bronze, :bronze, :bronze)
-      player1.buy(:gold)
-    end
   end
 
   describe Player do
     let(:player) { Player.new }
     it "has a starting deck for each player" do
-      # Factor out to Player?  Law of Demeter?
-      # Maybe like?
-      # player.deck.count.should == 10
-      two_player_game.player1.deck.count.should == 10
+      player.deck.count.should == 10
+    end
+
+    it "can buy a silver" do
+      # I'm pretty sure we need to mock hand since we don't want setters on it
+      player.stub(:hand, [:estate, :estate, :bronze, :bronze, :bronze])
+      # player1.play(:estate) Can't play a victory card
+      player.play(:bronze, :bronze, :bronze)
+      player.buy(:silver) #silver costs 3, but it doesn't matter
+      player.buy(:silver).should be_true
+      player.deck.should include :silver
+    end
+
+    # No community cards yet, first get the basics working, then we'll
+    # describe each type of card
+    it "has a discard pile" do
+      player.shuffle_deck # shuffle whole deck
+      player.discard_pile.should be_empty
+      player.deal_hand
+      player.finish
+      player.discard.size.should == 5
     end
 
     # Check out the README to give you ideas on what kind of tests to write
