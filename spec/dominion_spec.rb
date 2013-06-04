@@ -12,13 +12,15 @@ class Player
   def initialize
     @hand = []
     @deck = [:estate] * 3 + [:bronze] * 7
+    @discard_pile = []
   end
 
   attr_reader :hand
   attr_accessor :deck
+  attr_accessor :discard_pile
 
   def deal_hand
-    @hand = deck.shuffle[0..4]
+    @hand = deck[0..4]
     @hand
   end
 
@@ -28,6 +30,16 @@ class Player
   def buy(card)
     @deck << card
     true
+  end
+
+  def shuffle_deck
+    @deck.shuffle
+  end
+
+  def finish
+    @discard_pile = @hand
+    @hand = []
+    @discard_pile
   end
 end
 
@@ -46,13 +58,22 @@ end
 
 
 describe "Dominion" do
-  let(:two_player_game) {Game.new(Player.new, Player.new)}
+  let(:player1) { Player.new }
+  let(:player2) { Player.new }
+  let(:two_player_game) {Game.new(player1, player2)}
   let(:three_player_game) {Game.new(Player.new, Player.new, Player.new)}
 
   describe Game do
     it "has a set of players" do
       two_player_game.players.count.should == 2
       three_player_game.players.count.should == 3
+    end
+
+    it "alternates turns after a player finishes his turn" do
+      two_player_game.turn.should == player1
+      player1.deal_hand
+      player1.finish
+      two_player_game.turn.should == player2
     end
 
   end
@@ -80,7 +101,7 @@ describe "Dominion" do
       player.discard_pile.should be_empty
       player.deal_hand
       player.finish
-      player.discard.size.should == 5
+      player.discard_pile.size.should == 5
     end
 
     # Check out the README to give you ideas on what kind of tests to write
@@ -88,6 +109,7 @@ describe "Dominion" do
       player.deal_hand
       player.hand.count.should == 5
     end
+
   end
 
 
